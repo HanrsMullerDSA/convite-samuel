@@ -34,9 +34,9 @@
   .fraunces{font-family:'Noto Serif Yezidi',serif; font-weight:700;}
   .script{font-family:'Sofia',cursive;}
 
-  .slide{position:relative; min-height:100svh; display:flex; flex-direction:column;
+  .slide{position:relative; min-height:auto; display:flex; flex-direction:column;
     align-items:center; justify-content:center; text-align:center; padding:2.6rem 1.6rem; overflow:hidden;}
-  .slide.auto{min-height:auto; padding:4.5rem 1.6rem;}
+  .slide.auto{min-height:auto; padding:2.6rem 1.6rem;}
 
   .deco-abs{position:absolute; will-change:transform;}
   .parallax-flow{position:relative; width:100%; display:flex; justify-content:center; will-change:transform;}
@@ -267,7 +267,7 @@
     <div class="rsvp-card">
       <h2 class="fraunces">Esperamos por você!</h2>
       <h2 class="script-sub">Confirme sua presença</h2>
-      <p class="lead">Cada convite tem um código próprio - verifique o seu abaixo.</p>
+      <p class="lead">Cada convite tem um código próprio - insira o seu abaixo.</p>
 
       <div id="code-step">
         <div class="code-row">
@@ -282,7 +282,7 @@
 
       <div id="details-step">
         <div class="field">
-          <label for="pessoas">Quantas pessoas dessa vaga vêm com você</label>
+          <label for="pessoas">Quantas pessoas contando com você?</label>
           <select id="pessoas"></select>
         </div>
         <div id="names-container"></div>
@@ -482,7 +482,7 @@
       return;
     }
     activeCode = code;
-    codeFeedback.textContent = `Convite de ${family.name} — ${remaining} vaga(s) disponível(is).`;
+    codeFeedback.textContent = `Convite de ${family.name} — ${remaining} senha(s) disponível(is).`;
     codeFeedback.classList.add('success');
     pessoasSelect.innerHTML = '';
     for (let i = 1; i <= remaining; i++) {

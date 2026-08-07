@@ -148,6 +148,19 @@
   .family-item ul{list-style:none; margin:.6rem 0 0; padding:0; font-size:.82rem;}
   .family-item li{padding:.35rem 0; border-top:1px solid #f2ece1;}
   .family-item li .msg{display:block; color:var(--navy-soft); font-size:.78rem;}
+  .conf-row{display:flex; justify-content:space-between; align-items:flex-start; gap:.5rem;}
+  .btn-delete-conf{
+    flex:0 0 auto; background:none; border:none; color:var(--navy-soft); cursor:pointer;
+    font-size:.85rem; line-height:1; padding:.1rem .3rem; border-radius:6px;
+  }
+  .btn-delete-conf:hover{color:#b0503f; background:#fdf1ee;}
+  .btn-delete-family{
+    display:block; width:100%; margin-top:.8rem; background:none; border:1.5px solid #f0d9d3;
+    color:#b0503f; font-family:'Quicksand',sans-serif; font-weight:700; font-size:.8rem;
+    padding:.5rem; border-radius:10px; cursor:pointer;
+  }
+  .btn-delete-family:hover{background:#fdf1ee;}
+  .btn-delete-family:disabled{opacity:.6; cursor:default;}
   .summary-total{text-align:center; font-weight:700; color:var(--navy); background:#eaf6fb; border-radius:12px; padding:.6rem; margin-top:.8rem; font-size:.9rem;}
 </style>
 </head>
@@ -609,7 +622,12 @@
       details.className = 'family-item';
       const confirmadosHtml = (fam.confirmados || []).map(c => {
         const nomesTexto = (c.nomes && c.nomes.length) ? c.nomes.join(', ') : (c.nome || '(sem nome)');
-        return `<li><b>${escapeHtml(nomesTexto)}</b> — ${c.pessoas} pessoa(s)${c.mensagem ? `<span class="msg">"${escapeHtml(c.mensagem)}"</span>` : ''}</li>`;
+        return `<li>
+          <div class="conf-row">
+            <div><b>${escapeHtml(nomesTexto)}</b> — ${c.pessoas} pessoa(s)${c.mensagem ? `<span class="msg">"${escapeHtml(c.mensagem)}"</span>` : ''}</div>
+            <button type="button" class="btn-delete-conf" data-code="${escapeHtml(code)}" data-data="${escapeHtml(c.data)}" title="Remover essa confirmação">✕</button>
+          </div>
+        </li>`;
       }).join('') || '<li style="color:var(--navy-soft);">Ainda sem confirmações.</li>';
       details.innerHTML = `
         <summary>
@@ -617,11 +635,36 @@
           <span class="tag">${code}</span>
         </summary>
         <ul>${confirmadosHtml}</ul>
+        <button type="button" class="btn-delete-family" data-code="${escapeHtml(code)}">🗑️ Excluir este convite</button>
       `;
       listEl.appendChild(details);
     });
     document.getElementById('admin-total').textContent = `Total: ${totalConfirmado} de ${totalVagas} vagas confirmadas`;
   }
+
+  document.getElementById('family-list').addEventListener('click', async (e) => {
+    const delFam = e.target.closest('.btn-delete-family');
+    if (delFam) {
+      const code = delFam.dataset.code;
+      if (!confirm(`Excluir o convite ${code}? Isso remove também todas as confirmações feitas com esse código.`)) return;
+      delFam.disabled = true;
+      delFam.textContent = 'Excluindo...';
+      const result = await postAction('deleteFamily', { codigo: code });
+      if (!result.ok) alert('Não foi possível excluir. Tente novamente.');
+      await renderAdmin();
+      return;
+    }
+    const delConf = e.target.closest('.btn-delete-conf');
+    if (delConf) {
+      const code = delConf.dataset.code;
+      const data = delConf.dataset.data;
+      if (!confirm('Remover essa confirmação da lista?')) return;
+      const result = await postAction('deleteConfirmation', { codigo: code, data });
+      if (!result.ok) alert('Não foi possível remover. Tente novamente.');
+      await renderAdmin();
+      return;
+    }
+  });
 
   function buildExportRows(families) {
     const rows = [];

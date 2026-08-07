@@ -628,14 +628,18 @@
     Object.keys(families).forEach(code => {
       const fam = families[code];
       (fam.confirmados || []).forEach(c => {
-        const nomesTexto = (c.nomes && c.nomes.length) ? c.nomes.join('; ') : (c.nome || '');
-        rows.push({
-          'Codigo': code,
-          'Familia_Convite': fam.name,
-          'Nomes': nomesTexto,
-          'Pessoas': c.pessoas,
-          'Mensagem': c.mensagem || '',
-          'Confirmado_em': c.data ? new Date(c.data).toLocaleString('pt-BR') : ''
+        const nomes = (c.nomes && c.nomes.length) ? c.nomes : (c.nome ? [c.nome] : []);
+        const confirmadoEm = c.data ? new Date(c.data).toLocaleString('pt-BR') : '';
+        nomes.forEach(nome => {
+          rows.push({
+            'Codigo': code,
+            'Familia_Convite': fam.name,
+            'Nome': nome,
+            'Pessoas_no_grupo': c.pessoas,
+            'Mensagem': c.mensagem || '',
+            'Confirmado_em': confirmadoEm,
+            'Compareceu': ''
+          });
         });
       });
     });
